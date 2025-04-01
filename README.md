@@ -1,2 +1,4 @@
-# cpd_posts
-Public posts on various topics spanning: networking, security, AI and much more!
+# Welcome to ZimCanIT CPD posts
+
+* The aim of this repository is to facilitate knowldge share across topics that spark my curiosity
+* As always, happy learning!
