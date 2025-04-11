@@ -73,7 +73,7 @@ resource "azurerm_network_security_group" "spoke_nsg" {
     source_port_range            = "*"
     destination_port_range       = "*"
     source_address_prefixes      = [var.iis_nic_private_ip]
-    destination_address_prefixes = ["192.168.0.4", "192.168.0.20"]
+    destination_address_prefixes = ["192.168.0.4", "192.168.0.20", "192.168.0.36"]
   }
 
   security_rule {
