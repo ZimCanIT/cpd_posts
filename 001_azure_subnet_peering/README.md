@@ -44,3 +44,4 @@ az network vnet peering show `
 
 * [How to configure subnet peering](https://learn.microsoft.com/en-us/azure/virtual-network/how-to-configure-subnet-peering)
 * [avm-res-network-virtualnetwork](https://registry.terraform.io/modules/Azure/avm-res-network-virtualnetwork/azurerm/latest)
+* [Download `Multi-Remote Next Generation Connection Manager`](https://mremoteng.org/download)
