@@ -1,0 +1,51 @@
+{
+  "allowForwardedTraffic": false,
+  "allowGatewayTransit": false,
+  "allowVirtualNetworkAccess": true,
+  "doNotVerifyRemoteGateways": false,
+  "enableOnlyIPv6Peering": false,
+  "etag": "W/\"f07859ba-cf1d-4a58-babc-d1646df490e1\"",
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG-ZIMCANIT-SNETPEERING-DMO-UKS-001/providers/Microsoft.Network/virtualNetworks/VNET-HUB-UKS-001/virtualNetworkPeerings/vnet-hub-uks-001--to--vnet-spoke-uks-001",
+  "localAddressSpace": {
+    "addressPrefixes": [
+      "192.168.5.0/28"
+    ]
+  },
+  "localSubnetNames": [
+    "snet-iiscore-frontend"
+  ],
+  "localVirtualNetworkAddressSpace": {
+    "addressPrefixes": [
+      "192.168.5.0/28"
+    ]
+  },
+  "name": "vnet-hub-uks-001--to--vnet-spoke-uks-001",
+  "peerCompleteVnets": false,
+  "peeringState": "Connected",
+  "peeringSyncLevel": "FullyInSync",
+  "provisioningState": "Succeeded",
+  "remoteAddressSpace": {
+    "addressPrefixes": [
+      "192.168.0.0/28",
+      "192.168.0.16/28"
+    ]
+  },
+  "remoteSubnetNames": [
+    "snet-sql-backend",
+    "snet-integration-backend"
+  ],
+  "remoteVirtualNetwork": {
+    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG-ZIMCANIT-SNETPEERING-DMO-UKS-001/providers/Microsoft.Network/virtualNetworks/VNET-SPOKE-UKS-001",
+    "resourceGroup": "RG-ZIMCANIT-SNETPEERING-DMO-UKS-001"
+  },
+  "remoteVirtualNetworkAddressSpace": {
+    "addressPrefixes": [
+      "192.168.0.0/28",
+      "192.168.0.16/28"
+    ]
+  },
+  "resourceGroup": "RG-ZIMCANIT-SNETPEERING-DMO-UKS-001",
+  "resourceGuid": "50bbd5c1-2d2d-09aa-05da-b01655a4183e",
+  "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+  "useRemoteGateways": false
+}

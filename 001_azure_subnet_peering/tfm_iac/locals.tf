@@ -9,7 +9,7 @@ locals {
     "Business Unit"      = "IT"
   }
 
-  hub_vnet_subnet_names = ["iis-core-frontend-001", "analytics-platform-001", "syslog-servers-001"]
+  hub_vnet_subnet_names = ["snet-iiscore-frontend", "snet-analytics-platform", "snet-syslog-servers"]
   hub_vnet_address      = "192.168.5.0/24"
 
   hub_vnet_subnets = {
@@ -23,7 +23,7 @@ locals {
     }
   }
 
-  spoke_vnet_subnet_names = ["sql-server-backend-001", "cloud-backup-001", "biz-reporting-001"]
+  spoke_vnet_subnet_names = ["snet-sql-backend", "snet-integration-backend", "snet-hsm-backend"]
   spoke_vnet_address      = "192.168.0.0/24"
 
   spoke_vnet_subnets = {
@@ -38,15 +38,15 @@ locals {
   }
 
   spoke_vms = {
-    "sql-server-backend-001" = {
+    "snet-sql-backend" = {
       vm_name    = "vmsqlsrv"
       private_ip = "192.168.0.4"
     }
-    "cloud-backup-001" = {
+    "snet-integration-backend" = {
       vm_name    = "vmcloudbackup"
       private_ip = "192.168.0.20"
     }
-    "biz-reporting-001" = {
+    "snet-hsm-backend" = {
       vm_name    = "vmbizreports"
       private_ip = "192.168.0.36"
     }
