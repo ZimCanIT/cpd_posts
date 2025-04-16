@@ -18,7 +18,23 @@
   * `az login`
   * `az account set -s <your subscription id>`
   * `az account show`
-* Within directory `tfm_iac\` run terraform commands workflow:
+* Register the virtal network peering feature: `Microsoft.Network/AllowMultiplePeeringLinksBetweenVnets`
+  * Register subnet perering feature: `az feature register --namespace Microsoft.Network --name AllowMultiplePeeringLinksBetweenVnets`. 
+    * Desired output below: 
+```
+{
+  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Features/providers/Microsoft.Network/features/AllowMultiplePeeringLinksBetweenVnets",
+  "name": "Microsoft.Network/AllowMultiplePeeringLinksBetweenVnets",
+  "properties": {
+    "state": "Registering"
+  },
+  "type": "Microsoft.Features/providers/features"
+}
+```
+  * Show status of feature registration: `az feature show --name AllowMultiplePeeringLinksBetweenVnets --namespace Microsoft.Network --query 'properties.state' -o tsv`
+    * Desired output below: `Registered`
+* Within directory `tfm_iac\`, create a `terraform.tfvars` file and populate the variables mentioned in the example `terraform.tfvars.example` conf. file.
+* Within directory `tfm_iac\`, deploy the Azure infrastructure with the below terraform commands:
   * `terraform init`
   * `terraform plan -out snet_peering.tfplan` 
   * `terraform apply -auto-approve ".\snet_peering.tfplan"`
@@ -89,6 +105,28 @@ resource "azurerm_virtual_network_peering" "spoke_to_hub" {
   ]
 }
 ```
+* Ensure your Azure subscriptions are registered with the resource provider `Microsoft.Network/AllowMultiplePeeringLinksBetweenVnets`. 
+  * Otherwise, during deployment, subnet peering will fail as is shown below:
+```
+│ Error: waiting for Virtual Network Peering (Subscription: "00000000-0000-0000-0000-000000000000"
+│ Resource Group Name: "RG-ZIMCANIT-SNETPEERING-DMO-UKS-001"
+│ Virtual Network Name: "VNET-HUB-UKS-001"
+│ Virtual Network Peering Name: "VNET-HUB-UKS-001--to--VNET-SPOKE-UKS-001") to be created: unexpected status 400 (400 Bad Request) with error: SubscriptionNotRegisteredForFeature: Subscription 00000000-0000-0000-0000-000000000000 is not registered for feature Microsoft.Network/AllowMultiplePeeringLinksBetweenVnets required to carry out the requested operation.
+│
+│   with azurerm_virtual_network_peering.hub_to_spoke,
+│   on network.tf line 27, in resource "azurerm_virtual_network_peering" "hub_to_spoke":
+│   27: resource "azurerm_virtual_network_peering" "hub_to_spoke" {
+
+│ Error: waiting for Virtual Network Peering (Subscription: "00000000-0000-0000-0000-000000000000"
+│ Resource Group Name: "RG-ZIMCANIT-SNETPEERING-DMO-UKS-001"
+│ Virtual Network Name: "VNET-SPOKE-UKS-001"
+│ Virtual Network Peering Name: "VNET-SPOKE-UKS-001--to--VNET-HUB-UKS-001") to be created: unexpected status 400 (400 Bad Request) with error: SubscriptionNotRegisteredForFeature: Subscription 00000000-0000-0000-0000-000000000000 is not registered for feature Microsoft.Network/AllowMultiplePeeringLinksBetweenVnets required to carry out the requested operation.
+│
+│   with azurerm_virtual_network_peering.spoke_to_hub,
+│   on network.tf line 48, in resource "azurerm_virtual_network_peering" "spoke_to_hub":
+│   48: resource "azurerm_virtual_network_peering" "spoke_to_hub" {
+```
+  * The registration process is defined in the ***Deployment*** steps.
 
 
 ## Resource destruction 
