@@ -33,6 +33,7 @@
 ```
   * Show status of feature registration: `az feature show --name AllowMultiplePeeringLinksBetweenVnets --namespace Microsoft.Network --query 'properties.state' -o tsv`
     * Desired output below: `Registered`
+  * Propogate the registration of the subnet peering feature: `az provider register -n Microsoft.Network`
 * Within directory `tfm_iac\`, create a `terraform.tfvars` file and populate the variables mentioned in the example `terraform.tfvars.example` conf. file.
 * Within directory `tfm_iac\`, deploy the Azure infrastructure with the below terraform commands:
   * `terraform init`
