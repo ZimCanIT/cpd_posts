@@ -35,6 +35,62 @@ az network vnet peering show `
 ```
   * Within file: `vnet_hub_peering_info.txt`, review attributes such as `localSubnetNames`, `remoteSubnetNames`, `localVirtualNetworkAddressSpace` and `remoteVirtualNetworkAddressSpace` to validate peering configuration.
 
+## Caveats
+
+* The effective routes table for server, `vmbizreports-uks-001`, within non-peered subnet `snet-hsm-backend` will show a route to the iis server workload. Despite subnet peering explicity excluding the hsm subnet.
+* ***Root cause***: Peering still occurs at the VNet level in Azure as effective routes are propagated for the entire remote VNet's CIDR range to the network interface cards in the local subnet. 
+  * The route `192.168.5.0/28` (`snet-iiscore-frontend`) is injected into the HSM vm's effective route table.
+
+![snet_peering_architecture](images/az_001_nic-vmbizreports-uks-001_effective_routes.png)
+
+* Explicitly defining the local and remote subnet names in the peering definition restricts traffic flow to-and-fro the HSM and IIS servers:
+  * VNet peering definition TFM code: 
+
+```
+resource "azurerm_virtual_network_peering" "hub_to_spoke" {
+  name                      = "VNET-HUB-UKS-001--to--VNET-SPOKE-UKS-001"
+  resource_group_name       = azurerm_resource_group.rg.name
+  virtual_network_name      = module.hub_vnet.name
+  remote_virtual_network_id = module.spoke_vnet.resource_id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic = false
+  allow_gateway_transit = false 
+  peer_complete_virtual_networks_enabled = false
+  use_remote_gateways = false 
+
+  local_subnet_names = [
+    module.hub_vnet.subnets["snet-iiscore-frontend"].name
+  ]
+
+  remote_subnet_names = [
+    module.spoke_vnet.subnets["snet-sql-backend"].name,
+    module.spoke_vnet.subnets["snet-integration-backend"].name
+  ]
+}
+
+resource "azurerm_virtual_network_peering" "spoke_to_hub" {
+  name                      = "VNET-SPOKE-UKS-001--to--VNET-HUB-UKS-001"
+  resource_group_name       = azurerm_resource_group.rg.name
+  virtual_network_name      = module.spoke_vnet.name
+  remote_virtual_network_id = module.hub_vnet.resource_id
+  allow_virtual_network_access = true
+  allow_forwarded_traffic = false
+  allow_gateway_transit = false 
+  peer_complete_virtual_networks_enabled = false
+  use_remote_gateways = false 
+  
+  local_subnet_names = [
+    module.spoke_vnet.subnets["snet-sql-backend"].name,
+    module.spoke_vnet.subnets["snet-integration-backend"].name
+  ]
+
+  remote_subnet_names = [
+    module.hub_vnet.subnets["snet-iiscore-frontend"].name
+  ]
+}
+```
+
+
 ## Resource destruction 
 
 * Within directory `tfm_iac\` run the terraform command: `terraform destroy -auto-approve`

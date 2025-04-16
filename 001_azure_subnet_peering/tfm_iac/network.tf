@@ -4,7 +4,6 @@ resource "azurerm_resource_group" "rg" {
   tags     = local.tags
 }
 
-# https://registry.terraform.io/modules/Azure/avm-res-network-virtualnetwork/azurerm/latest
 module "hub_vnet" {
   source              = "Azure/avm-res-network-virtualnetwork/azurerm"
   name                = "VNET-HUB-UKS-001"
@@ -23,55 +22,47 @@ module "spoke_vnet" {
   address_space       = [local.spoke_vnet_address]
   subnets             = local.spoke_vnet_subnets
   tags                = local.tags
+}
 
-  peerings = {
-    spoketohub = {
-      name                               = "vnet-spoke-uks-001--to--vnet-hub-uks-001"
-      remote_virtual_network_resource_id = module.hub_vnet.resource_id
-      allow_forwarded_traffic            = false
-      allow_gateway_transit              = false
-      allow_virtual_network_access       = true
-      peer_complete_vnets                = false
-      local_peered_subnets = [
-        {
-          subnet_name = "snet-sql-backend"
-        },
-        {
-          subnet_name = "snet-integration-backend"
-        }
-      ]
-      remote_peered_subnets = [
-        {
-          subnet_name = module.hub_vnet.subnets["snet-iiscore-frontend"].name
-        }
-      ]
+resource "azurerm_virtual_network_peering" "hub_to_spoke" {
+  name                                   = "VNET-HUB-UKS-001--to--VNET-SPOKE-UKS-001"
+  resource_group_name                    = azurerm_resource_group.rg.name
+  virtual_network_name                   = module.hub_vnet.name
+  remote_virtual_network_id              = module.spoke_vnet.resource_id
+  allow_virtual_network_access           = true
+  allow_forwarded_traffic                = false
+  allow_gateway_transit                  = false
+  peer_complete_virtual_networks_enabled = false
+  use_remote_gateways                    = false
 
-      create_reverse_peering               = true
-      reverse_name                         = "vnet-hub-uks-001--to--vnet-spoke-uks-001"
-      reverse_allow_forwarded_traffic      = false
-      reverse_allow_gateway_transit        = false
-      reverse_allow_virtual_network_access = true
-      reverse_peer_complete_vnets          = false
-      reverse_local_peered_subnets = [
-        {
-          subnet_name = module.hub_vnet.subnets["snet-iiscore-frontend"].name
-        }
-      ]
-      reverse_remote_peered_subnets = [
-        {
-          subnet_name = "snet-sql-backend"
-        },
-        {
-          subnet_name = "snet-integration-backend"
-        }
-      ]
-    }
-  }
+  local_subnet_names = [
+    module.hub_vnet.subnets["snet-iiscore-frontend"].name
+  ]
 
-  depends_on = [
-    azurerm_resource_group.rg,
-    module.hub_vnet,
-    azurerm_network_security_group.spoke_nsg
+  remote_subnet_names = [
+    module.spoke_vnet.subnets["snet-sql-backend"].name,
+    module.spoke_vnet.subnets["snet-integration-backend"].name
+  ]
+}
+
+resource "azurerm_virtual_network_peering" "spoke_to_hub" {
+  name                                   = "VNET-SPOKE-UKS-001--to--VNET-HUB-UKS-001"
+  resource_group_name                    = azurerm_resource_group.rg.name
+  virtual_network_name                   = module.spoke_vnet.name
+  remote_virtual_network_id              = module.hub_vnet.resource_id
+  allow_virtual_network_access           = true
+  allow_forwarded_traffic                = false
+  allow_gateway_transit                  = false
+  peer_complete_virtual_networks_enabled = false
+  use_remote_gateways                    = false
+
+  local_subnet_names = [
+    module.spoke_vnet.subnets["snet-sql-backend"].name,
+    module.spoke_vnet.subnets["snet-integration-backend"].name
+  ]
+
+  remote_subnet_names = [
+    module.hub_vnet.subnets["snet-iiscore-frontend"].name
   ]
 }
 
