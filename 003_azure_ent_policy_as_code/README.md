@@ -20,9 +20,6 @@
 
 ## Resource destruction 
 
-* Within directory `tfm_iac\` run the terraform command: `terraform destroy -auto-approve`
-* Logout of azure: `az logout`
-
 ## Docs
 
 * [Enterprise Azure Policy as Code Overview](https://azure.github.io/enterprise-azure-policy-as-code/)
